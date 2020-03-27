@@ -6,3 +6,10 @@ based on
 
 - https://github.com/sw-yx/smaller-safer-serverless-starter
 - https://docs.dev.to/api/
+
+## Specs
+
+- give a DEV API key -> ben halpern to give Oauth
+- list blogposts <--
+- edit blogposts
+- create a new post <--

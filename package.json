@@ -1,5 +1,6 @@
 {
-  "name": "create-next-app-cli",
+  "name": "dev-to-cms",
+  "private": true,
   "version": "0.1.0",
   "description": "",
   "main": "index.js",
