@@ -2,7 +2,7 @@ import React from "react";
 
 const header =
   process.env.NODE_ENV === "production"
-    ? "https://devtocms.now.sh"
+    ? "https://dev-to-cms.now.sh"
     : "http://localhost:3000";
 
 export default ({ currentApiKey }: { currentApiKey: string }) => {

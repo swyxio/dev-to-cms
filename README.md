@@ -2,6 +2,8 @@
 
 This is a small CMS for dev.to authors. personal use for now but may open up for others to use in future.
 
+Deployed to: https://dev-to-cms.now.sh/
+
 based on
 
 - https://github.com/sw-yx/smaller-safer-serverless-starter

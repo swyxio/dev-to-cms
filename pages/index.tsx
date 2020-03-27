@@ -387,42 +387,83 @@ export default () => {
             className="flex-1 relative z-0 overflow-y-auto pt-2 pb-6 focus:outline-none md:py-6"
             tabIndex={0}
           >
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex justify-between max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               <h1 className="text-2xl font-semibold text-gray-900">
                 Dashboard
               </h1>
+
+              <form onSubmit={handleSubmit} className="w-2/6">
+                <div>
+                  <label
+                    htmlFor="email"
+                    className="block text-sm font-medium leading-5 text-gray-700"
+                  >
+                    API KEY
+                  </label>
+                  <div className="flex mt-1 relative rounded-md shadow-sm">
+                    <input
+                      name="apikey"
+                      type={isHidden ? "password" : "text"}
+                      className="form-input rounded-r-none block w-full sm:text-sm sm:leading-5"
+                      placeholder="your api key here"
+                      defaultValue={currentApiKey}
+                    />
+                    <button
+                      onClick={() => setIsHidden(!isHidden)}
+                      className="-ml-px relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-gray text-sm leading-5 font-medium text-gray-500 hover:text-gray-400 focus:z-10 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue active:bg-gray-100 active:text-gray-500 transition ease-in-out duration-150"
+                    >
+                      {isHidden ? (
+                        <svg
+                          fill="currentColor"
+                          viewBox="0 0 20 20"
+                          className="w-6 h-6"
+                        >
+                          <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"></path>
+                          <path
+                            fill-rule="evenodd"
+                            d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z"
+                            clip-rule="evenodd"
+                          ></path>
+                        </svg>
+                      ) : (
+                        <svg
+                          fill="currentColor"
+                          viewBox="0 0 20 20"
+                          className="w-6 h-6"
+                        >
+                          <path
+                            fill-rule="evenodd"
+                            d="M13.477 14.89A6 6 0 015.11 6.524l8.367 8.368zm1.414-1.414L6.524 5.11a6 6 0 018.367 8.367zM18 10a8 8 0 11-16 0 8 8 0 0116 0z"
+                            clip-rule="evenodd"
+                          ></path>
+                        </svg>
+                      )}
+                    </button>
+                    <span className="inline-flex pl-4 rounded-md shadow-sm">
+                      <button
+                        type="submit"
+                        className="inline-flex items-center px-2.5 py-1.5 border border-transparent text-xs leading-4 font-medium rounded text-white bg-indigo-600 hover:bg-indigo-500 focus:outline-none focus:border-indigo-700 focus:shadow-outline-indigo active:bg-indigo-700 transition ease-in-out duration-150"
+                      >
+                        Submit
+                      </button>
+                    </span>
+                  </div>
+                </div>
+              </form>
             </div>
 
             <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8"></div>
-
-            <div className="py-4 w-4/6 mx-auto">
-              <div className="border-4 border-gray-200 rounded-lg h-96">
-                <form onSubmit={handleSubmit}>
-                  <div>
-                    <label
-                      htmlFor="email"
-                      className="block text-sm font-medium leading-5 text-gray-700"
-                    >
-                      API KEY
-                    </label>
-                    <div className="flex mt-1 relative rounded-md shadow-sm">
-                      <input
-                        name="apikey"
-                        type={isHidden ? "password" : "text"}
-                        className="form-input block w-full sm:text-sm sm:leading-5"
-                        placeholder="your api key here"
-                        defaultValue={currentApiKey}
-                      />
-                      <button onClick={() => setIsHidden(!isHidden)}>
-                        {isHidden ? "Show" : "Hidden"}
-                      </button>
-                    </div>
-                  </div>
-                  <button type="submit">submit</button>
-                </form>
+            {currentApiKey ? (
+              <PostsList currentApiKey={currentApiKey} />
+            ) : (
+              <div>
+                Please input an API key to proceed. You can retrieve an API key
+                at{" "}
+                <a href="https://dev.to/settings/account">
+                  https://dev.to/settings/account
+                </a>
               </div>
-            </div>
-            <PostsList currentApiKey={currentApiKey} />
+            )}
           </main>
         </div>
       </div>
