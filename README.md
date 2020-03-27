@@ -1,9 +1,8 @@
-## Swyx's Smaller Safer Serverless Starter
+## Dev.To CMS
 
-This is a Preact + TypeScript + Tailwind + Next.js (with API Routes) Starter project.
+This is a small CMS for dev.to authors. personal use for now but may open up for others to use in future.
 
 based on
 
-- https://github.com/developit/nextjs-preact-demo
-- https://nextjs.org/docs/basic-features/typescript#api-routes
-- https://tailwindcss.com/components/navigation
+- https://github.com/sw-yx/smaller-safer-serverless-starter
+- https://docs.dev.to/api/

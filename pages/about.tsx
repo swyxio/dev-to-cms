@@ -7,15 +7,15 @@ export default () => (
     <Head title="Home" />
     <Nav />
     <div className="bg-white">
-      <div className="max-w-screen-xl mx-auto pt-12 pb-16 sm:pt-16 sm:pb-20 px-4 sm:px-6 lg:pt-20 lg:pb-28 lg:px-8">
-        <h2 className="text-3xl leading-9 font-extrabold text-gray-900">
-          About / FAWs
+      <div className="max-w-screen-xl px-4 pt-12 pb-16 mx-auto sm:pt-16 sm:pb-20 sm:px-6 lg:pt-20 lg:pb-28 lg:px-8">
+        <h2 className="text-3xl font-extrabold leading-9 text-gray-900">
+          About / FAQs
         </h2>
-        <div className="mt-6 border-t-2 border-gray-100 pt-10">
+        <div className="pt-10 mt-6 border-t-2 border-gray-100">
           <dl className="md:grid md:grid-cols-2 md:gap-8">
             <div>
               <div>
-                <dt className="text-lg leading-6 font-medium text-gray-900">
+                <dt className="text-lg font-medium leading-6 text-gray-900">
                   Where is the source code?
                 </dt>
                 <dd className="mt-2">
@@ -26,7 +26,7 @@ export default () => (
                 </dd>
               </div>
               <div className="mt-12">
-                <dt className="text-lg leading-6 font-medium text-gray-900">
+                <dt className="text-lg font-medium leading-6 text-gray-900">
                   How do you make holy water?
                 </dt>
                 <dd className="mt-2">
@@ -38,7 +38,7 @@ export default () => (
                 </dd>
               </div>
               <div className="mt-12">
-                <dt className="text-lg leading-6 font-medium text-gray-900">
+                <dt className="text-lg font-medium leading-6 text-gray-900">
                   What do you call someone with no body and no nose?
                 </dt>
                 <dd className="mt-2">
@@ -51,7 +51,7 @@ export default () => (
             </div>
             <div className="mt-12 md:mt-0">
               <div>
-                <dt className="text-lg leading-6 font-medium text-gray-900">
+                <dt className="text-lg font-medium leading-6 text-gray-900">
                   What is the least spoken language in the world?
                 </dt>
                 <dd className="mt-2">
@@ -62,7 +62,7 @@ export default () => (
                 </dd>
               </div>
               <div className="mt-12">
-                <dt className="text-lg leading-6 font-medium text-gray-900">
+                <dt className="text-lg font-medium leading-6 text-gray-900">
                   Why can't you hear a pterodactyl go to the bathroom?
                 </dt>
                 <dd className="mt-2">
@@ -74,7 +74,7 @@ export default () => (
                 </dd>
               </div>
               <div className="mt-12">
-                <dt className="text-lg leading-6 font-medium text-gray-900">
+                <dt className="text-lg font-medium leading-6 text-gray-900">
                   Why did the invisible man turn down the job offer?
                 </dt>
                 <dd className="mt-2">
