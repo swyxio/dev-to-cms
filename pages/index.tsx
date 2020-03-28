@@ -1,27 +1,23 @@
 import React from "react";
 import Head from "../components/head";
 import Nav from "../components/nav";
+import { useApiKey } from "../components/useApiKey";
 
 import PostsList from "../components/PostsList";
 
 export default () => {
-  let storedApiKey;
-  if (typeof window !== "undefined") {
-    storedApiKey = window.localStorage.getItem("devToApiKey");
-  }
+  const [apiKey, setApiKey] = useApiKey();
   const [isHidden, setIsHidden] = React.useState(true);
-  const [currentApiKey, setCurrentApiKey] = React.useState(storedApiKey);
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const target = event.target as HTMLFormElement & {
       apikey: { value: string };
     };
-    window.localStorage.setItem("devToApiKey", target.apikey.value);
-    setCurrentApiKey(currentApiKey);
+    setApiKey(target.apikey.value);
   };
   return (
     <div>
-      <Head title="Editor" />
+      <Head title="Dashboard" />
       <Nav />
 
       <div
@@ -406,7 +402,7 @@ export default () => {
                       type={isHidden ? "password" : "text"}
                       className="form-input rounded-r-none block w-full sm:text-sm sm:leading-5"
                       placeholder="your api key here"
-                      defaultValue={currentApiKey}
+                      defaultValue={apiKey}
                     />
                     <button
                       onClick={() => setIsHidden(!isHidden)}
@@ -453,8 +449,8 @@ export default () => {
             </div>
 
             <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8"></div>
-            {currentApiKey ? (
-              <PostsList currentApiKey={currentApiKey} />
+            {apiKey ? (
+              <PostsList apiKey={apiKey} />
             ) : (
               <div>
                 Please input an API key to proceed. You can retrieve an API key
