@@ -5,6 +5,12 @@ import Link from "next/link";
 import { useApiKey } from "../components/useApiKey";
 import { useMutation } from "react-query";
 import { useForm } from "react-hook-form";
+import Editor from "react-simple-code-editor";
+import hljs from "highlight.js/lib/highlight";
+import javascript from "highlight.js/lib/languages/javascript";
+import markdown from "highlight.js/lib/languages/markdown";
+hljs.registerLanguage("javascript", javascript);
+hljs.registerLanguage("markdown", markdown);
 
 const header =
   process.env.NODE_ENV === "production"
@@ -20,14 +26,6 @@ type Article = {
   canonical_url?: string;
 };
 
-const sampleArticle = {
-  title: "Hello, World!",
-  published: false,
-  body_markdown: "Hello DEV, this is my first post",
-  tags: ["discuss", "help"],
-  series: "Hello series"
-};
-
 const createNewArticle = (args: { apiKey: string; article: Article }) =>
   fetch(`${header}/api/devto`, {
     method: "POST",
@@ -39,14 +37,23 @@ const createNewArticle = (args: { apiKey: string; article: Article }) =>
   });
 export default () => {
   const [apiKey] = useApiKey();
-  const [mutate, { status, data, error }] = useMutation(createNewArticle);
-  const { register, handleSubmit, watch, errors } = useForm();
+  const [mutate, { status, error }] = useMutation(createNewArticle);
+  const { register, handleSubmit, setValue, watch, errors } = useForm();
+  const [postBody, setPostBody] = React.useState("");
   const onSubmit = data => {
-    console.log(data);
+    mutate({
+      apiKey,
+      article: {
+        title: data.post_title,
+        published: data.post_isPublished || false,
+        body_markdown: postBody,
+        tags: data.post_tags.split(",").map(x => x.trim())
+        // series: "Hello series"
+      }
+    });
   };
   const [isShowingFrontmatter, setIsShowingFrontmatter] = React.useState(true);
 
-  const handleClick = () => mutate({ apiKey, article: sampleArticle });
   return (
     <div>
       <Head title="Editor" />
@@ -56,7 +63,7 @@ export default () => {
           onSubmit={handleSubmit(onSubmit)}
           className="bg-white overflow-hidden shadow rounded-lg"
         >
-          <div className="flex justify-between border-b border-gray-200 px-4 py-5 sm:px-6">
+          <div className="sticky flex justify-between border-b border-gray-200 px-4 py-5 sm:px-6">
             {/* header */}
             <h1 className="inline">
               {watch("post_title") || (
@@ -110,7 +117,7 @@ export default () => {
                             placeholder="My Amazing Post"
                             className="mt-1 form-input block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:shadow-outline-blue focus:border-blue-300 transition duration-150 ease-in-out sm:text-sm sm:leading-5"
                             autoFocus
-                            ref={register}
+                            ref={register({ required: true, minLength: 3 })}
                           />
                         </div>
 
@@ -126,7 +133,7 @@ export default () => {
                             name="post_tags"
                             placeholder="React, JavaScript, Advice, Reflections"
                             className="mt-1 form-input block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:shadow-outline-blue focus:border-blue-300 transition duration-150 ease-in-out sm:text-sm sm:leading-5"
-                            ref={register}
+                            ref={register({ required: true, minLength: 3 })}
                           />
                         </div>
 
@@ -193,16 +200,22 @@ export default () => {
                       Post Body (Markdown)
                     </label>
                     <div className="rounded-md shadow-sm">
-                      <textarea
-                        name="post_body"
-                        rows={30}
-                        className="form-textarea mt-1 block w-full transition duration-150 ease-in-out sm:text-sm sm:leading-5"
-                        placeholder={`Bootstrapping stealth accelerator first mover advantage hackathon pitch validation user experience gen-z customer. Founders responsive web design technology holy grail termsheet early adopters conversion MVP user experience leverage validation business-to-consumer. Niche market agile development network effects incubator burn rate product management disruptive. Release handshake twitter.
-
-                          Hackathon partnership bandwidth paradigm shift ownership low hanging fruit mass market equity long tail virality churn rate. Rockstar vesting period mass market facebook accelerator marketing infrastructure focus low hanging fruit business-to-consumer market. Disruptive low hanging fruit channels vesting period. Research & development validation growth hacking infographic ownership sales analytics backing incubator lean startup channels.
-                          
-                          Termsheet traction churn rate. Low hanging fruit facebook buyer gen-z. Rockstar creative market investor non-disclosure agreement partner network advisor value proposition focus A/B testing leverage ownership. Series A financing alpha analytics business plan partner network user experience low hanging fruit branding prototype early adopters business model canvas responsive web design.`}
-                      ></textarea>
+                      <Editor
+                        value={postBody}
+                        onValueChange={code => setPostBody(code)}
+                        highlight={code => {
+                          const temp = hljs.highlight("markdown", code);
+                          // console.log({ temp });
+                          return temp.value;
+                        }}
+                        padding={10}
+                        style={{
+                          fontFamily: '"Fira code", "Fira Mono", monospace',
+                          fontSize: 12,
+                          height: 300
+                        }}
+                        // className="bg-blue-900"
+                      />
                     </div>
                     <p className="mt-2 text-sm text-gray-500">
                       Brief description for your profile. URLs are hyperlinked.
@@ -233,8 +246,7 @@ export default () => {
                 {error && <div className="bg-red-50">{error}</div>}
               </div>
               <button
-                type="button"
-                onClick={handleClick}
+                type="submit"
                 className="inline-flex items-center px-2.5 py-1.5 border border-transparent text-xs leading-4 font-medium rounded text-white bg-indigo-600 hover:bg-indigo-500 focus:outline-none focus:border-indigo-700 focus:shadow-outline-indigo active:bg-indigo-700 transition ease-in-out duration-150"
               >
                 Submit
