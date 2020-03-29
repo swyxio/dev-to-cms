@@ -38,7 +38,7 @@ const createNewArticle = (args: { apiKey: string; article: Article }) =>
 export default () => {
   const [apiKey] = useApiKey();
   const [mutate, { status, error }] = useMutation(createNewArticle);
-  const { register, handleSubmit, setValue, watch, errors } = useForm();
+  const { register, handleSubmit, watch, errors } = useForm();
   const [postBody, setPostBody] = React.useState("");
   const onSubmit = data => {
     mutate({
@@ -47,7 +47,7 @@ export default () => {
         title: data.post_title,
         published: data.post_isPublished || false,
         body_markdown: postBody,
-        tags: data.post_tags.split(",").map(x => x.trim())
+        tags: data.post_tags && data.post_tags.split(",").map(x => x.trim())
         // series: "Hello series"
       }
     });
@@ -218,7 +218,7 @@ export default () => {
                       />
                     </div>
                     <p className="mt-2 text-sm text-gray-500">
-                      Brief description for your profile. URLs are hyperlinked.
+                      You can write in Markdown.
                     </p>
                   </div>
                 </div>
