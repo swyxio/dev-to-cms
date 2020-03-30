@@ -5,12 +5,6 @@ import Link from "next/link";
 import { useApiKey } from "../components/useApiKey";
 import { useMutation } from "react-query";
 import { useForm } from "react-hook-form";
-import Editor from "react-simple-code-editor";
-import hljs from "highlight.js/lib/highlight";
-import javascript from "highlight.js/lib/languages/javascript";
-import markdown from "highlight.js/lib/languages/markdown";
-hljs.registerLanguage("javascript", javascript);
-hljs.registerLanguage("markdown", markdown);
 
 const header =
   process.env.NODE_ENV === "production"
@@ -200,22 +194,7 @@ export default () => {
                       Post Body (Markdown)
                     </label>
                     <div className="rounded-md shadow-sm">
-                      <Editor
-                        value={postBody}
-                        onValueChange={code => setPostBody(code)}
-                        highlight={code => {
-                          const temp = hljs.highlight("markdown", code);
-                          // console.log({ temp });
-                          return temp.value;
-                        }}
-                        padding={10}
-                        style={{
-                          fontFamily: '"Fira code", "Fira Mono", monospace',
-                          fontSize: 12,
-                          height: 300
-                        }}
-                        // className="bg-blue-900"
-                      />
+                      <div id="EDITOR">TODO: EDITOR HERE</div>
                     </div>
                     <p className="mt-2 text-sm text-gray-500">
                       You can write in Markdown.
