@@ -6,6 +6,9 @@ import { useApiKey } from "../components/useApiKey";
 import { useMutation } from "react-query";
 import { useForm } from "react-hook-form";
 
+import dynamic from "next/dynamic";
+const MonacoEditor = dynamic(import("react-monaco-editor"), { ssr: false });
+
 const header =
   process.env.NODE_ENV === "production"
     ? "https://dev-to-cms.now.sh"
@@ -194,10 +197,49 @@ export default () => {
                       Post Body (Markdown)
                     </label>
                     <div className="rounded-md shadow-sm">
-                      <div id="EDITOR">TODO: EDITOR HERE</div>
+                      <MonacoEditor
+                        editorDidMount={() => {
+                          // @ts-ignore
+                          window.MonacoEnvironment.getWorkerUrl = (
+                            _moduleId: string,
+                            label: string
+                          ) => {
+                            if (label === "json")
+                              return "_next/static/json.worker.js";
+                            if (label === "css")
+                              return "_next/static/css.worker.js";
+                            if (label === "html")
+                              return "_next/static/html.worker.js";
+                            if (
+                              label === "typescript" ||
+                              label === "javascript"
+                            )
+                              return "_next/static/ts.worker.js";
+                            return "_next/static/editor.worker.js";
+                          };
+                        }}
+                        width="800"
+                        height="600"
+                        language="markdown"
+                        theme="vs-dark"
+                        value={postBody}
+                        options={{
+                          minimap: {
+                            enabled: false
+                          },
+                          fontSize: 16,
+                          wordWrap: "on",
+                          lineNumbersMinChars: 3,
+                          wrappingIndent: "same",
+                          mouseWheelZoom: true,
+                          copyWithSyntaxHighlighting: false
+                          // acceptSuggestionOnEnter: "smart" // not sure i want this
+                        }}
+                        onChange={setPostBody}
+                      />
                     </div>
                     <p className="mt-2 text-sm text-gray-500">
-                      You can write in Markdown.
+                      Ctrl + Scroll/Pinch to Zoom Fontsize
                     </p>
                   </div>
                 </div>
