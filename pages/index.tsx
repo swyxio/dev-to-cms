@@ -2,7 +2,6 @@ import React from "react";
 import Head from "../components/head";
 import Nav from "../components/nav";
 import { useApiKey } from "../components/useApiKey";
-
 import PostsList from "../components/PostsList";
 
 export default () => {

@@ -8,6 +8,7 @@ import { useRouter } from "next/router";
 import { Post } from "../../types";
 import { handleErrors } from "../../utils";
 import { useNotification } from "../../components/Notification";
+import { executeCreateArticleMutation } from "../../components/OneGraphController";
 
 const header =
   process.env.NODE_ENV === "production"
@@ -17,10 +18,10 @@ const header =
 type Article = {
   title: string;
   published: boolean;
-  body_markdown: string;
+  bodyMarkdown: string;
   tags: string[];
   series?: string;
-  canonical_url?: string;
+  canonicalUrl?: string;
 };
 
 /**
@@ -36,19 +37,11 @@ export default () => {
   const router = useRouter();
   const { postNotification, NotificationElement } = useNotification();
   const createNewArticle = (args: { apiKey: string; article: Article }) =>
-    fetch(`${header}/api/devto`, {
-      method: "POST",
-      headers: {
-        "api-key": args.apiKey,
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ article: args.article })
-    })
+    executeCreateArticleMutation(args.apiKey, args.article)
       .then(handleErrors(postNotification))
-      .then(x => x.json())
-      .then((data: Post) => {
+      .then(data => {
         console.log({ data });
-        router.push(`/editor/${data.id}`);
+        router.push(`/editor/${data.devTo.createArticle.article.id}`);
       });
   const [mutate, { status, error }] = useMutation(createNewArticle);
 

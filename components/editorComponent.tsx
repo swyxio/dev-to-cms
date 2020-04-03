@@ -6,7 +6,6 @@ const MonacoEditor = dynamic(import("react-monaco-editor"), { ssr: false });
 import { useFormik } from "formik";
 const marked = require("marked");
 import { safeStringArr } from "../utils";
-import("wc-spinners/dist/half-circle-spinner.js");
 
 //  https://marked.js.org/#/USING_ADVANCED.md#options
 marked.setOptions({
@@ -44,9 +43,9 @@ export default function EditorComponent(props: {
 }) {
   const { onSubmit, existingPost, submitState, NotificationElement } = props;
 
-  // React.useEffect(() => {
-  //   import("wc-spinners/dist/half-circle-spinner.js");
-  // });
+  React.useEffect(() => {
+    import("wc-spinners/dist/half-circle-spinner.js");
+  });
   /** visual toggles */
   const [isShowingFrontmatter, setIsShowingFrontmatter] = React.useState(true);
   const [isShowingMarkdown, setIsShowingMarkdown] = React.useState(true);
@@ -65,10 +64,10 @@ export default function EditorComponent(props: {
       onSubmit({
         title: values.post_title,
         published: values.post_isPublished,
-        body_markdown: values.post_body,
+        bodyMarkdown: values.post_body,
         tags: values.post_tags.split(",").map(x => x.trim()),
         series: undefined, //TODO, fix
-        canonical_url: values.post_canonical_url
+        canonicalUrl: values.post_canonical_url
       });
     }
   });

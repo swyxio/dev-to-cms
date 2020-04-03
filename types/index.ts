@@ -1,10 +1,10 @@
 export type Article = {
   title: string;
   published: boolean;
-  body_markdown: string;
+  bodyMarkdown: string;
   tags: string[];
   series?: string;
-  canonical_url?: string;
+  canonicalUrl?: string;
 };
 
 export type Post = {

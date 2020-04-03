@@ -1,7 +1,7 @@
 import fetch from "node-fetch";
 import { NextApiRequest, NextApiResponse } from "next";
 
-const DEBUG = true;
+const DEBUG = false;
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   if (DEBUG) console.log("method: ", req.method, " reqURL", req.url);
   const {
