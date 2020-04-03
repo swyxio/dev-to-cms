@@ -1,34 +1,69 @@
 import React from "react";
 import Link from "next/link";
 import dynamic from "next/dynamic";
-import { Article } from "../types";
+import { Article, Post } from "../types";
 const MonacoEditor = dynamic(import("react-monaco-editor"), { ssr: false });
 import { useFormik } from "formik";
+const marked = require("marked");
+import { safeStringArr } from "../utils";
+import("wc-spinners/dist/half-circle-spinner.js");
 
+//  https://marked.js.org/#/USING_ADVANCED.md#options
+marked.setOptions({
+  renderer: new marked.Renderer(),
+  highlight: function(code, language) {
+    const hljs = require("highlight.js");
+    const validLanguage = hljs.getLanguage(language) ? language : "plaintext";
+    return hljs.highlight(validLanguage, code).value;
+  },
+  pedantic: false,
+  gfm: true,
+  breaks: false,
+  sanitize: false,
+  smartLists: true,
+  smartypants: false,
+  xhtml: false
+});
+
+/**
+ *
+ * Main
+ *
+ */
 export default function EditorComponent(props: {
   onSubmit: (data: Article) => void;
+  submitState: {
+    status: "success" | "loading" | "error";
+    error: Error | null;
+  };
   existingPost?: {
-    data: Article;
+    data: Post;
     status: "success" | "loading" | "error";
   };
+  NotificationElement: JSX.Element;
 }) {
-  const { onSubmit, existingPost } = props;
+  const { onSubmit, existingPost, submitState, NotificationElement } = props;
+
+  // React.useEffect(() => {
+  //   import("wc-spinners/dist/half-circle-spinner.js");
+  // });
+  /** visual toggles */
   const [isShowingFrontmatter, setIsShowingFrontmatter] = React.useState(true);
+  const [isShowingMarkdown, setIsShowingMarkdown] = React.useState(true);
+  const [isShowingPreview, setIsShowingPreview] = React.useState(true);
+
   let formik = useFormik({
     initialValues: {
-      post_title: existingPost?.data?.title || "",
-      post_body: existingPost?.data?.body_markdown || "",
-      post_canonical_url: existingPost?.data?.canonical_url || "",
-      post_isPublished: (existingPost?.data?.published || "false") as string,
-      post_tags: existingPost?.data?.tags?.join(", ") || ""
+      post_title: "",
+      post_body: "",
+      post_canonical_url: "",
+      post_isPublished: false,
+      post_tags: ""
     },
     onSubmit: values => {
-      // onSubmit(data) // TODO
-      // remember to parse post_tags and check post_isPublished
       console.log({ values });
       onSubmit({
         title: values.post_title,
-        // @ts-ignore
         published: values.post_isPublished,
         body_markdown: values.post_body,
         tags: values.post_tags.split(",").map(x => x.trim()),
@@ -42,8 +77,8 @@ export default function EditorComponent(props: {
       post_title: existingPost?.data?.title || "",
       post_body: existingPost?.data?.body_markdown || "",
       post_canonical_url: existingPost?.data?.canonical_url || "",
-      post_isPublished: (existingPost?.data?.published || "false") as string,
-      post_tags: existingPost?.data?.tags?.join(", ") || ""
+      post_isPublished: !!existingPost?.data?.published_at,
+      post_tags: safeStringArr(existingPost?.data?.tag_list).join(", ") || ""
     });
   }, [existingPost?.data]);
 
@@ -53,6 +88,8 @@ export default function EditorComponent(props: {
         Loading...
       </div>
     );
+
+  const markdownPreviewHTML: string = marked(formik.values.post_body);
   return (
     <div className="max-w-7xl mx-auto sm:px-6 lg:px-8 py-5 bg-gray-300">
       <form
@@ -146,7 +183,7 @@ export default function EditorComponent(props: {
                               type="checkbox"
                               className="form-checkbox h-4 w-4 text-indigo-600 transition duration-150 ease-in-out"
                               onChange={formik.handleChange}
-                              value={formik.values.post_isPublished}
+                              checked={formik.values.post_isPublished}
                             />
                           </div>
                           <div className="pl-7 text-sm leading-5">
@@ -196,51 +233,90 @@ export default function EditorComponent(props: {
             <div className="">
               <div className="">
                 <div className="mt-6">
-                  <label
-                    htmlFor="post_body"
-                    className="block text-sm leading-5 font-medium text-gray-700"
-                  >
-                    Post Body (Markdown)
-                  </label>
-                  <div className="rounded-md shadow-sm">
-                    <MonacoEditor
-                      editorDidMount={() => {
-                        // @ts-ignore
-                        window.MonacoEnvironment.getWorkerUrl = (
-                          _moduleId: string,
-                          label: string
-                        ) => {
-                          if (label === "json")
-                            return "_next/static/json.worker.js";
-                          if (label === "css")
-                            return "_next/static/css.worker.js";
-                          if (label === "html")
-                            return "_next/static/html.worker.js";
-                          if (label === "typescript" || label === "javascript")
-                            return "_next/static/ts.worker.js";
-                          return "_next/static/editor.worker.js";
-                        };
-                      }}
-                      width="800"
-                      height="600"
-                      language="markdown"
-                      theme="vs-dark"
-                      value={formik.values.post_body}
-                      options={{
-                        minimap: {
-                          enabled: false
-                        },
-                        fontSize: 16,
-                        wordWrap: "on",
-                        lineNumbersMinChars: 3,
-                        wrappingIndent: "same",
-                        mouseWheelZoom: true,
-                        copyWithSyntaxHighlighting: false
-                        // acceptSuggestionOnEnter: "smart" // not sure i want this
-                      }}
-                      onChange={post => formik.setFieldValue("post_body", post)}
-                    />
+                  <div className="flex justify-center pb-5">
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setIsShowingMarkdown(
+                          isShowingPreview ? !isShowingMarkdown : true
+                        )
+                      }
+                      className={`${
+                        isShowingMarkdown ? "bg-gray-200" : "bg-white"
+                      } relative inline-flex items-center px-4 py-2 rounded-l-md border border-gray-300 text-sm leading-5 font-medium text-gray-700 hover:text-gray-500 focus:z-10 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue active:bg-gray-100 active:text-gray-700 transition ease-in-out duration-150"`}
+                    >
+                      Markdown
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setIsShowingPreview(
+                          isShowingMarkdown ? !isShowingPreview : true
+                        )
+                      }
+                      className={`${
+                        isShowingPreview ? "bg-gray-200" : "bg-white"
+                      } -ml-px relative inline-flex items-center px-4 py-2 rounded-r-md border border-gray-300 text-sm leading-5 font-medium text-gray-700 hover:text-gray-500 focus:z-10 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue active:bg-gray-100 active:text-gray-700 transition ease-in-out duration-150`}
+                    >
+                      Preview
+                    </button>
                   </div>
+                  <div className="flex rounded-md shadow-sm">
+                    {isShowingMarkdown && (
+                      <div className="flex-1">
+                        <MonacoEditor
+                          editorDidMount={() => {
+                            // @ts-ignore
+                            window.MonacoEnvironment.getWorkerUrl = (
+                              _moduleId: string,
+                              label: string
+                            ) => {
+                              if (label === "json")
+                                return "_next/static/json.worker.js";
+                              if (label === "css")
+                                return "_next/static/css.worker.js";
+                              if (label === "html")
+                                return "_next/static/html.worker.js";
+                              if (
+                                label === "typescript" ||
+                                label === "javascript"
+                              )
+                                return "_next/static/ts.worker.js";
+                              return "_next/static/editor.worker.js";
+                            };
+                          }}
+                          width="100%"
+                          height="600"
+                          language="markdown"
+                          theme="vs-dark"
+                          value={formik.values.post_body}
+                          options={{
+                            minimap: {
+                              enabled: false
+                            },
+                            fontSize: 16,
+                            wordWrap: "on",
+                            lineNumbersMinChars: 3,
+                            wrappingIndent: "same",
+                            mouseWheelZoom: true,
+                            copyWithSyntaxHighlighting: false
+                            // acceptSuggestionOnEnter: "smart" // not sure i want this
+                          }}
+                          onChange={post =>
+                            formik.setFieldValue("post_body", post)
+                          }
+                        />
+                      </div>
+                    )}
+                    {isShowingPreview && (
+                      <iframe
+                        className="flex-1"
+                        // dangerouslySetInnerHTML={{ __html: markdownPreviewHTML }}
+                        srcDoc={githubstyles + markdownPreviewHTML}
+                      />
+                    )}
+                  </div>
+
                   <p className="mt-2 text-sm text-gray-500">
                     Ctrl + Scroll/Pinch to Zoom Fontsize
                   </p>
@@ -261,18 +337,19 @@ export default function EditorComponent(props: {
             </span>
           </Link>
           <span className="inline-flex rounded-md shadow-sm">
-            <div>
-              Status: TODO
-              {/* todo: change color based on status */}
-              {/* <span className="inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium leading-5 bg-gray-100 text-gray-800">
-                {status}
-              </span> */}
-              {/* {error && <div className="bg-red-50">{error}</div>} */}
-            </div>
+            {NotificationElement}
             <button
               type="submit"
-              className="inline-flex items-center px-2.5 py-1.5 border border-transparent text-xs leading-4 font-medium rounded text-white bg-indigo-600 hover:bg-indigo-500 focus:outline-none focus:border-indigo-700 focus:shadow-outline-indigo active:bg-indigo-700 transition ease-in-out duration-150"
+              disabled={submitState.status === "loading"}
+              className={`${
+                submitState.status === "loading"
+                  ? "bg-gray-500"
+                  : "bg-indigo-600 hover:bg-indigo-500"
+              } inline-flex items-center px-2.5 py-1.5 border border-transparent text-xs leading-4 font-medium rounded text-white focus:outline-none focus:border-indigo-700 focus:shadow-outline-indigo active:bg-indigo-700 transition ease-in-out duration-150`}
             >
+              {submitState.status === "loading" && (
+                <half-circle-spinner size="12" className="pr-1" />
+              )}
               Submit
             </button>
           </span>
@@ -285,3 +362,106 @@ export default function EditorComponent(props: {
     </div>
   );
 }
+
+const githubstyles = `
+<style>
+
+.hljs {
+  display: block;
+  overflow-x: auto;
+  padding: 0.5em;
+  color: #333;
+  background: #f8f8f8;
+}
+
+.hljs-comment,
+.hljs-quote {
+  color: #998;
+  font-style: italic;
+}
+
+.hljs-keyword,
+.hljs-selector-tag,
+.hljs-subst {
+  color: #333;
+  font-weight: bold;
+}
+
+.hljs-number,
+.hljs-literal,
+.hljs-variable,
+.hljs-template-variable,
+.hljs-tag .hljs-attr {
+  color: #008080;
+}
+
+.hljs-string,
+.hljs-doctag {
+  color: #d14;
+}
+
+.hljs-title,
+.hljs-section,
+.hljs-selector-id {
+  color: #900;
+  font-weight: bold;
+}
+
+.hljs-subst {
+  font-weight: normal;
+}
+
+.hljs-type,
+.hljs-class .hljs-title {
+  color: #458;
+  font-weight: bold;
+}
+
+.hljs-tag,
+.hljs-name,
+.hljs-attribute {
+  color: #000080;
+  font-weight: normal;
+}
+
+.hljs-regexp,
+.hljs-link {
+  color: #009926;
+}
+
+.hljs-symbol,
+.hljs-bullet {
+  color: #990073;
+}
+
+.hljs-built_in,
+.hljs-builtin-name {
+  color: #0086b3;
+}
+
+.hljs-meta {
+  color: #999;
+  font-weight: bold;
+}
+
+.hljs-deletion {
+  background: #fdd;
+}
+
+.hljs-addition {
+  background: #dfd;
+}
+
+.hljs-emphasis {
+  font-style: italic;
+}
+
+.hljs-strong {
+  font-weight: bold;
+}
+pre {
+  background-color: #ccc;
+  padding: 10px;
+}
+</style>
+`;

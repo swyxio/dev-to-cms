@@ -2,6 +2,7 @@ import React from "react";
 import { Post } from "../types";
 import Link from "next/link";
 import { useQuery } from "react-query";
+import { safeStringArr } from "../utils";
 const header =
   process.env.NODE_ENV === "production"
     ? "https://dev-to-cms.now.sh"
@@ -52,7 +53,7 @@ export default ({ apiKey }: { apiKey: string }) => {
                               {post.title}
                             </div>
                             <div className="flex flex-col space-y-4 sm:space-y-0 sm:flex-row sm:space-x-4">
-                              {post.tag_list.map(tag => (
+                              {safeStringArr(post.tag_list).map(tag => (
                                 <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium leading-4 bg-gray-100 text-gray-800">
                                   {tag}
                                 </span>

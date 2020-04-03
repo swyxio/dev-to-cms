@@ -5,6 +5,7 @@ import { useApiKey } from "../../components/useApiKey";
 import { useMutation, useQuery } from "react-query";
 import EditorComponent from "../../components/editorComponent";
 import { useRouter } from "next/router";
+import { useNotification } from "../../components/Notification";
 
 const header =
   process.env.NODE_ENV === "production"
@@ -33,6 +34,7 @@ export default function EditExistingPosts() {
   const { postId } = router.query;
   const [apiKey] = useApiKey();
 
+  const { postNotification, NotificationElement } = useNotification();
   const updateExistingArticle = (args: { apiKey: string; article: Article }) =>
     fetch(`${header}/api/devto/${postId}`, {
       method: "PUT",
@@ -41,20 +43,45 @@ export default function EditExistingPosts() {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({ article: args.article })
-    });
+    })
+      .then(x => x.json())
+      .then(data => {
+        console.log("posting...", data);
+        postNotification({
+          type: "success",
+          title: `Post ${data.id} updated`,
+          message: (
+            <span>
+              Post url{" "}
+              <a
+                href={data.url}
+                className="text-indigo-600 hover:text-green-600 hover:underline"
+                target="_blank"
+              >
+                {data.url}
+              </a>
+            </span>
+          )
+        });
+      });
 
   const [mutate, mutationStatus] = useMutation(updateExistingArticle);
-  // mutationStatus  has { status, error }
 
-  const { status, data, error } = useQuery(postId && ["post", postId], () => {
-    console.log(`fetching ${header}/api/devto/${postId}`);
-    return fetch(`${header}/api/devto/${postId}`, {
-      headers: {
-        "api-key": apiKey
-        // "Content-Type": "application/json"
-      }
-    }).then(x => x.json());
-  });
+  const { status, data, error } = useQuery(
+    postId && ["post", postId],
+    () => {
+      console.log(`fetching ${header}/api/devto/${postId}`);
+      return fetch(`${header}/api/devto/${postId}`, {
+        headers: {
+          "api-key": apiKey
+          // "Content-Type": "application/json"
+        }
+      }).then(x => x.json());
+    },
+    {
+      refetchOnWindowFocus: false // https://twitter.com/tannerlinsley/status/1245869449829212160
+    }
+  );
 
   const onSubmit = data => {
     mutate({
@@ -69,7 +96,14 @@ export default function EditExistingPosts() {
     <div>
       <Head title="Editor" />
       <Nav />
-      <EditorComponent onSubmit={onSubmit} existingPost={{ data, status }} />
+      <EditorComponent
+        submitState={mutationStatus}
+        {...{
+          NotificationElement,
+          onSubmit
+        }}
+        existingPost={{ data, status }}
+      />
     </div>
   );
 }

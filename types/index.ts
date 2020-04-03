@@ -15,7 +15,8 @@ export type Post = {
   cover_image: string;
   published: true;
   published_at: string;
-  tag_list: string[];
+  tag_list: string | string[];
+  tags: string[];
   slug: string;
   path: string;
   url: string;

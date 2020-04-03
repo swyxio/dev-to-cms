@@ -24,10 +24,26 @@ based on
 - [x] give a DEV API key
 - [x] list blogposts
 - [x] edit blogposts
+- [ ] Clone existing post
 - [x] create a new post
+  - [ ] mark document dirty and prompt before leaving
+  - [ ] if dirty, save to local state and restore!
+  - [ ] when focused on editor, autoscroll up nicely
+  - [ ] keyboard shortcuts for toggling states
+  - [x] Redirect to edit after posting
+  - [x] Markdown preview with toggles
+    - [ ] resize nicely
+      - https://stackoverflow.com/questions/47017753/monaco-editor-dynamically-resizable
+      - https://github.com/microsoft/monaco-editor/issues/28
+      - https://github.com/Microsoft/monaco-editor/issues/71
+      - https://github.com/microsoft/monaco-editor/issues/103
+      - https://github.com/Microsoft/monaco-editor/issues/543
+  - [x] Async status -> nicer UX when clicking submit
+    - [x] Disable submit button
+    - [x] show spinner while inflight - web component!! https://github.com/craigjennings11/wc-spinners/
+    - [x] Show error! - using notifications as a hook!
 - [ ] integrate Oauth flow from Ben Halpern
 - [x] Monaco Editor
-- [ ] clone existing post
 
 We will not offer deleting blogposts but can unpublish.
 
