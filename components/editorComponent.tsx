@@ -10,7 +10,7 @@ import { safeStringArr } from "../utils";
 //  https://marked.js.org/#/USING_ADVANCED.md#options
 marked.setOptions({
   renderer: new marked.Renderer(),
-  highlight: function(code, language) {
+  highlight: function (code, language) {
     const hljs = require("highlight.js");
     const validLanguage = hljs.getLanguage(language) ? language : "plaintext";
     return hljs.highlight(validLanguage, code).value;
@@ -21,7 +21,7 @@ marked.setOptions({
   sanitize: false,
   smartLists: true,
   smartypants: false,
-  xhtml: false
+  xhtml: false,
 });
 
 /**
@@ -57,19 +57,19 @@ export default function EditorComponent(props: {
       post_body: "",
       post_canonical_url: "",
       post_isPublished: false,
-      post_tags: ""
+      post_tags: "",
     },
-    onSubmit: values => {
+    onSubmit: (values) => {
       console.log({ values });
       onSubmit({
         title: values.post_title,
         published: values.post_isPublished,
         bodyMarkdown: values.post_body,
-        tags: values.post_tags.split(",").map(x => x.trim()),
+        tags: values.post_tags.split(",").map((x) => x.trim()),
         series: undefined, //TODO, fix
-        canonicalUrl: values.post_canonical_url
+        canonicalUrl: values.post_canonical_url,
       });
-    }
+    },
   });
   React.useEffect(() => {
     formik.setValues({
@@ -77,7 +77,7 @@ export default function EditorComponent(props: {
       post_body: existingPost?.data?.body_markdown || "",
       post_canonical_url: existingPost?.data?.canonical_url || "",
       post_isPublished: !!existingPost?.data?.published_at,
-      post_tags: safeStringArr(existingPost?.data?.tag_list).join(", ") || ""
+      post_tags: safeStringArr(existingPost?.data?.tag_list).join(", ") || "",
     });
   }, [existingPost?.data]);
 
@@ -291,27 +291,29 @@ export default function EditorComponent(props: {
                           value={formik.values.post_body}
                           options={{
                             minimap: {
-                              enabled: false
+                              enabled: false,
                             },
                             fontSize: 16,
                             wordWrap: "on",
                             lineNumbersMinChars: 3,
                             wrappingIndent: "same",
                             mouseWheelZoom: true,
-                            copyWithSyntaxHighlighting: false
+                            copyWithSyntaxHighlighting: false,
                             // acceptSuggestionOnEnter: "smart" // not sure i want this
                           }}
-                          onChange={post =>
+                          onChange={(post) =>
                             formik.setFieldValue("post_body", post)
                           }
                         />
                       </div>
                     )}
                     {isShowingPreview && (
-                      <iframe
-                        className="flex-1"
-                        // dangerouslySetInnerHTML={{ __html: markdownPreviewHTML }}
-                        srcDoc={githubstyles + markdownPreviewHTML}
+                      <div
+                        className="flex-1 unreset"
+                        dangerouslySetInnerHTML={{
+                          __html: markdownPreviewHTML,
+                        }}
+                        // srcDoc={githubstyles + markdownPreviewHTML}
                       />
                     )}
                   </div>
